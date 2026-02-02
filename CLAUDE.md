@@ -21,18 +21,21 @@ KoreaNomad는 한국의 디지털 노마드들이 최적의 도시를 찾고 커
 ./
 ├── CLAUDE.md                   # 프로젝트 가이드 (이 파일)
 ├── .claude/
+│   ├── timesheet-groups.json   # 타임시트 그룹 정의 파일
 │   └── commands/               # Claude Code 커스텀 커맨드
 │       ├── decompose.md
 │       ├── create-issue.md
-│       └── solve-issue.md
+│       ├── solve-issue.md
+│       └── timesheet-report.md
 ├── docs/                       # 기획 및 계획 문서
 │   ├── PRD.md
 │   ├── IMPROVEMENT_PLAN.md
 │   └── execution_plans/
+│       └── login.md            # 로그인 기능 실행 계획
 ├── wt-claude.sh                # 워크트리 + Claude Code 실행 스크립트
 ├── src/
 │   ├── app/                    # Next.js App Router 페이지
-│   │   ├── layout.tsx          # 루트 레이아웃
+│   │   ├── layout.tsx          # 루트 레이아웃 (AuthProvider 포함)
 │   │   ├── page.tsx            # 홈페이지
 │   │   ├── not-found.tsx       # 404 페이지
 │   │   ├── globals.css         # 전역 스타일 (OKLCH 테마)
@@ -42,13 +45,21 @@ KoreaNomad는 한국의 디지털 노마드들이 최적의 도시를 찾고 커
 │   │       └── [slug]/page.tsx # 도시 상세 페이지
 │   ├── components/
 │   │   ├── ui/                 # shadcn/ui 재사용 컴포넌트
+│   │   │   ├── badge.tsx
 │   │   │   ├── button.tsx
 │   │   │   ├── card.tsx
-│   │   │   ├── input.tsx
-│   │   │   ├── badge.tsx
-│   │   │   ├── sheet.tsx
 │   │   │   ├── carousel.tsx
+│   │   │   ├── dialog.tsx      # 모달 다이얼로그
+│   │   │   ├── dropdown-menu.tsx # 드롭다운 메뉴
+│   │   │   ├── input.tsx
+│   │   │   ├── label.tsx       # 폼 라벨
+│   │   │   ├── sheet.tsx
 │   │   │   └── motion.tsx      # Framer Motion 래퍼 (FadeIn, StaggerContainer, StaggerItem)
+│   │   ├── auth/               # 인증 컴포넌트
+│   │   │   ├── AuthButtons.tsx # 로그인/회원가입 버튼 래퍼
+│   │   │   ├── LoginModal.tsx  # 로그인 모달
+│   │   │   ├── SignupModal.tsx # 회원가입 모달
+│   │   │   └── UserMenu.tsx    # 로그인 후 사용자 드롭다운 메뉴
 │   │   ├── layout/             # 레이아웃 컴포넌트
 │   │   │   ├── Header.tsx
 │   │   │   ├── Footer.tsx
@@ -63,6 +74,7 @@ KoreaNomad는 한국의 디지털 노마드들이 최적의 도시를 찾고 커
 │   │   │   ├── Features.tsx
 │   │   │   └── CTASection.tsx
 │   │   ├── cities/             # 도시 목록 컴포넌트
+│   │   │   ├── CitiesContent.tsx # 도시 목록 메인 콘텐츠 래퍼
 │   │   │   ├── SearchBar.tsx
 │   │   │   ├── FilterPanel.tsx
 │   │   │   └── CityGrid.tsx
@@ -71,9 +83,12 @@ KoreaNomad는 한국의 디지털 노마드들이 최적의 도시를 찾고 커
 │   │       ├── CityInfo.tsx
 │   │       ├── CityReviews.tsx
 │   │       └── RelatedCities.tsx
+│   ├── contexts/
+│   │   └── AuthContext.tsx     # 인증 Context Provider & useAuth 훅
 │   ├── hooks/
 │   │   └── useDebounce.ts      # 디바운스 훅
 │   ├── lib/
+│   │   ├── auth.ts             # 인증 유틸리티 (localStorage 기반)
 │   │   └── utils.ts            # cn() 유틸리티 함수
 │   ├── types/
 │   │   └── index.ts            # TypeScript 타입 정의
@@ -147,6 +162,10 @@ npm run lint
 | `Statistic` | 통계 데이터 타입 |
 | `NavItem` | 네비게이션 링크 타입 |
 | `FooterSection` | 푸터 섹션 타입 |
+| `User` | 사용자 정보 (id, name, email, password, createdAt) |
+| `AuthState` | 인증 상태 (user, isAuthenticated) |
+| `LoginForm` | 로그인 폼 데이터 (email, password) |
+| `SignupForm` | 회원가입 폼 데이터 (name, email, password, confirmPassword) |
 
 ## 데이터 구조
 
@@ -181,6 +200,14 @@ import { useDebounce } from '@/hooks/useDebounce';
 const debouncedSearch = useDebounce(searchTerm, 300);
 ```
 
+### useAuth
+```typescript
+import { useAuth } from '@/contexts/AuthContext';
+
+// 사용 예시 (AuthProvider 내부에서만 사용 가능)
+const { user, isAuthenticated, login, signup, logout } = useAuth();
+```
+
 ## 모션 컴포넌트 (`src/components/ui/motion.tsx`)
 
 ### FadeIn
@@ -199,6 +226,58 @@ const debouncedSearch = useDebounce(searchTerm, 300);
   <StaggerItem direction="up">{item2}</StaggerItem>
 </StaggerContainer>
 ```
+
+## 인증 시스템
+
+localStorage 기반의 클라이언트 사이드 인증 시스템을 사용합니다.
+
+### 구조
+
+| 파일 | 역할 |
+|------|------|
+| `src/contexts/AuthContext.tsx` | AuthProvider, useAuth 훅 제공 |
+| `src/lib/auth.ts` | 사용자 CRUD, 세션 관리, 유효성 검사 유틸리티 |
+| `src/components/auth/AuthButtons.tsx` | 비로그인 시 로그인/회원가입 버튼 |
+| `src/components/auth/LoginModal.tsx` | 로그인 모달 다이얼로그 |
+| `src/components/auth/SignupModal.tsx` | 회원가입 모달 다이얼로그 |
+| `src/components/auth/UserMenu.tsx` | 로그인 후 사용자 드롭다운 메뉴 |
+
+### AuthContext (`useAuth` 훅)
+```typescript
+import { useAuth } from '@/contexts/AuthContext';
+
+const {
+  user,              // SafeUser | null (password 제외)
+  isAuthenticated,   // boolean
+  isLoading,         // boolean (초기 세션 복원 중)
+  isLoginModalOpen,  // boolean
+  isSignupModalOpen, // boolean
+  openLoginModal,    // () => void
+  openSignupModal,   // () => void
+  closeModals,       // () => void
+  switchToLogin,     // () => void (회원가입 → 로그인 전환)
+  switchToSignup,    // () => void (로그인 → 회원가입 전환)
+  login,             // (email, password) => { success, error? }
+  signup,            // (name, email, password, confirmPassword) => { success, error? }
+  logout,            // () => void
+} = useAuth();
+```
+
+### `src/lib/auth.ts` 주요 함수
+```typescript
+createUser(name, email, password): Omit<User, 'password'>
+authenticateUser(email, password): Omit<User, 'password'>
+saveCurrentUser(user): void
+getCurrentUser(): Omit<User, 'password'> | null
+clearCurrentUser(): void
+validateEmail(email): string | null
+validatePassword(password): string | null
+validateName(name): string | null
+```
+
+### localStorage 키
+- `koreanomad_users` - 등록된 사용자 목록
+- `koreanomad_current_user` - 현재 로그인된 사용자 세션
 
 ## 설정 파일
 
@@ -272,6 +351,34 @@ export async function generateStaticParams()
 - 검색 기능에 디바운싱 적용 (300ms)
 - 모든 외부 링크는 `target="_blank" rel="noopener noreferrer"` 사용
 - 접근성 고려 (WCAG 2.1 준수)
+
+## 커스텀 커맨드
+
+### /timesheet-report
+
+Clockwork Pro API를 활용하여 특정 그룹의 주간/월간 타임시트 리포트를 생성합니다. 개인 단위가 아닌 그룹 전체 관점에서 프로젝트/이슈 단위로 요약합니다.
+
+#### 사전 요구사항
+
+1. **API 토큰 설정**: `export CLOCKWORK_API_TOKEN="your-token-here"`
+2. **그룹 정의**: `.claude/timesheet-groups.json`에 그룹과 멤버 이메일을 정의
+
+#### 사용 예시
+
+```bash
+/timesheet-report frontend 주간 리포트
+/timesheet-report backend 월간 리포트
+/timesheet-report frontend 주간 PROJ          # 특정 프로젝트 필터
+/timesheet-report all 월간 리포트              # 전체 인원
+/timesheet-report backend 2025-01-01 ~ 2025-01-31  # 커스텀 기간
+```
+
+#### 리포트 구성
+
+1. **기본 정보**: 기간, 그룹, 총 근무시간, 프로젝트/이슈 수
+2. **프로젝트별 근무시간 요약**: 프로젝트 단위 시간, 비율
+3. **주요 프로젝트 활동 상세**: 우선순위 프로젝트의 워크로그 코멘트 요약 (최대 2~3라인)
+4. **프로젝트별 이슈 상세**: 이슈키, 요약, 담당자, 시간
 
 ## 참고 문서
 
