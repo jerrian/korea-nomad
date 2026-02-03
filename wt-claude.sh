@@ -225,7 +225,7 @@ run_claude() {
     cd "$dir"
 
     if [[ -n "$prompt" ]]; then
-        exec claude --prompt "$prompt"
+        exec claude "$prompt"
     else
         exec claude
     fi
