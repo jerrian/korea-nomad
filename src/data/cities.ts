@@ -14,6 +14,8 @@ export const allCities: City[] = [
     airQuality: 45,
     badge: 'HOT',
     tags: ['해변', '자연', '카페'],
+    likeCount: 87,
+    dislikeCount: 12,
   },
   {
     id: 'busan-haeundae',
@@ -28,6 +30,8 @@ export const allCities: City[] = [
     airQuality: 52,
     badge: 'POPULAR',
     tags: ['해변', '도시', '맛집'],
+    likeCount: 94,
+    dislikeCount: 15,
   },
   {
     id: 'gangneung',
@@ -42,6 +46,8 @@ export const allCities: City[] = [
     airQuality: 38,
     badge: 'TRENDING',
     tags: ['바다', '커피', '조용함'],
+    likeCount: 72,
+    dislikeCount: 8,
   },
   {
     id: 'sokcho',
@@ -56,6 +62,8 @@ export const allCities: City[] = [
     airQuality: 35,
     badge: 'NEW',
     tags: ['설악산', '해산물', '자연'],
+    likeCount: 56,
+    dislikeCount: 11,
   },
   {
     id: 'jeonju',
@@ -70,6 +78,8 @@ export const allCities: City[] = [
     airQuality: 48,
     badge: 'POPULAR',
     tags: ['한옥', '맛집', '문화'],
+    likeCount: 68,
+    dislikeCount: 14,
   },
   {
     id: 'gyeongju',
@@ -83,6 +93,8 @@ export const allCities: City[] = [
     weather: { temp: 11, condition: 'sunny' },
     airQuality: 42,
     tags: ['역사', '자전거', '조용함'],
+    likeCount: 51,
+    dislikeCount: 18,
   },
   {
     id: 'yeosu',
@@ -97,6 +109,8 @@ export const allCities: City[] = [
     airQuality: 40,
     badge: 'TRENDING',
     tags: ['바다', '야경', '케이블카'],
+    likeCount: 79,
+    dislikeCount: 10,
   },
   {
     id: 'daejeon-yuseong',
@@ -110,6 +124,8 @@ export const allCities: City[] = [
     weather: { temp: 9, condition: 'cloudy' },
     airQuality: 55,
     tags: ['온천', 'IT', '대학가'],
+    likeCount: 63,
+    dislikeCount: 16,
   },
   {
     id: 'chuncheon',
@@ -123,6 +139,8 @@ export const allCities: City[] = [
     weather: { temp: 7, condition: 'sunny' },
     airQuality: 40,
     tags: ['호수', '닭갈비', '자연'],
+    likeCount: 45,
+    dislikeCount: 13,
   },
   {
     id: 'daegu',
@@ -137,6 +155,8 @@ export const allCities: City[] = [
     airQuality: 58,
     badge: 'POPULAR',
     tags: ['도시', '카페', '문화'],
+    likeCount: 76,
+    dislikeCount: 20,
   },
   {
     id: 'gwangju',
@@ -150,6 +170,8 @@ export const allCities: City[] = [
     weather: { temp: 11, condition: 'cloudy' },
     airQuality: 50,
     tags: ['예술', '맛집', '문화'],
+    likeCount: 59,
+    dislikeCount: 17,
   },
   {
     id: 'suwon',
@@ -164,6 +186,8 @@ export const allCities: City[] = [
     airQuality: 60,
     badge: 'HOT',
     tags: ['화성', '도시', '교통'],
+    likeCount: 91,
+    dislikeCount: 22,
   },
   {
     id: 'seogwipo',
@@ -178,6 +202,8 @@ export const allCities: City[] = [
     airQuality: 38,
     badge: 'TRENDING',
     tags: ['해변', '폭포', '올레길'],
+    likeCount: 84,
+    dislikeCount: 9,
   },
   {
     id: 'pohang',
@@ -191,6 +217,8 @@ export const allCities: City[] = [
     weather: { temp: 12, condition: 'sunny' },
     airQuality: 48,
     tags: ['해변', '일출', '조용함'],
+    likeCount: 42,
+    dislikeCount: 19,
   },
   {
     id: 'tongyeong',
@@ -205,6 +233,8 @@ export const allCities: City[] = [
     airQuality: 42,
     badge: 'NEW',
     tags: ['섬', '해산물', '예술'],
+    likeCount: 67,
+    dislikeCount: 11,
   },
   {
     id: 'andong',
@@ -218,6 +248,8 @@ export const allCities: City[] = [
     weather: { temp: 9, condition: 'sunny' },
     airQuality: 45,
     tags: ['전통', '한옥', '조용함'],
+    likeCount: 38,
+    dislikeCount: 23,
   },
 ];
 

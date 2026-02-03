@@ -1,6 +1,9 @@
+'use client';
+
+import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Star, Wifi, Users, Sun, Cloud, CloudRain, Snowflake, Wind } from 'lucide-react';
+import { Star, Wifi, Users, Sun, Cloud, CloudRain, Snowflake, Wind, ThumbsUp, ThumbsDown } from 'lucide-react';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -33,6 +36,42 @@ const WeatherIcon = ({ condition }: { condition: string }) => {
 };
 
 export default function CityCard({ city }: CityCardProps) {
+  const [likeCount, setLikeCount] = useState(city.likeCount);
+  const [dislikeCount, setDislikeCount] = useState(city.dislikeCount);
+  const [userAction, setUserAction] = useState<'like' | 'dislike' | null>(null);
+
+  const handleLike = () => {
+    if (userAction === 'like') {
+      // 좋아요 취소
+      setLikeCount(prev => prev - 1);
+      setUserAction(null);
+    } else {
+      // 좋아요 추가
+      if (userAction === 'dislike') {
+        // 싫어요가 활성화되어 있으면 취소
+        setDislikeCount(prev => prev - 1);
+      }
+      setLikeCount(prev => prev + 1);
+      setUserAction('like');
+    }
+  };
+
+  const handleDislike = () => {
+    if (userAction === 'dislike') {
+      // 싫어요 취소
+      setDislikeCount(prev => prev - 1);
+      setUserAction(null);
+    } else {
+      // 싫어요 추가
+      if (userAction === 'like') {
+        // 좋아요가 활성화되어 있으면 취소
+        setLikeCount(prev => prev - 1);
+      }
+      setDislikeCount(prev => prev + 1);
+      setUserAction('dislike');
+    }
+  };
+
   return (
     <Card className="group overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
       {/* Image Section */}
@@ -101,7 +140,36 @@ export default function CityCard({ city }: CityCardProps) {
         </div>
       </CardContent>
 
-      <CardFooter className="p-4 pt-0">
+      <CardFooter className="p-4 pt-0 flex flex-col gap-3">
+        {/* 좋아요/싫어요 버튼 */}
+        <div className="flex justify-between items-center">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleLike}
+            className={`flex items-center gap-1.5 transition-all duration-200 ${
+              userAction === 'like' ? 'text-blue-500 dark:text-blue-400' : ''
+            }`}
+            aria-label="이 도시에 좋아요 표시"
+          >
+            <ThumbsUp className="w-4 h-4" />
+            <span>{likeCount}</span>
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleDislike}
+            className={`flex items-center gap-1.5 transition-all duration-200 ${
+              userAction === 'dislike' ? 'text-red-500 dark:text-red-400' : ''
+            }`}
+            aria-label="이 도시에 싫어요 표시"
+          >
+            <ThumbsDown className="w-4 h-4" />
+            <span>{dislikeCount}</span>
+          </Button>
+        </div>
+
+        {/* 기존 자세히 보기 버튼 */}
         <Button asChild variant="outline" className="w-full">
           <Link href={`/cities/${city.id}`}>자세히 보기</Link>
         </Button>
