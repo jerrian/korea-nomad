@@ -18,6 +18,8 @@ export interface City {
   airQuality: number;
   badge?: BadgeType;
   tags: string[];
+  likeCount: number;
+  dislikeCount: number;
 }
 
 export interface Testimonial {
