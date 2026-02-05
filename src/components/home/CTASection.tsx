@@ -6,6 +6,7 @@ import { Mail, CreditCard, RefreshCw, Shield, Rocket, CheckCircle, AlertCircle }
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { FadeIn } from '@/components/ui/motion';
+import { TEST_IDS } from '@/config/test-ids';
 
 function validateEmail(email: string): boolean {
   const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -43,7 +44,7 @@ export default function CTASection() {
   };
 
   return (
-    <section className="py-20 bg-gradient-to-br from-primary to-primary/80 text-primary-foreground">
+    <section className="py-20 bg-gradient-to-br from-primary to-primary/80 text-primary-foreground" data-testid={TEST_IDS.CTA_SECTION}>
       <div className="container mx-auto px-4 text-center">
         {/* Headline */}
         <FadeIn>

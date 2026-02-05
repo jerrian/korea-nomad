@@ -44,3 +44,8 @@ next-env.d.ts
 .claude/settings.local.json
 .claude/timesheet-groups.json
 /timesheet/
+
+# playwright
+/playwright-report/
+/test-results/
+/playwright/.cache/

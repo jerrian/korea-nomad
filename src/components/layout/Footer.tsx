@@ -1,10 +1,11 @@
 import Link from 'next/link';
 import { Twitter, Facebook, Instagram, Linkedin } from 'lucide-react';
 import { footerSections } from '@/data/cities';
+import { TEST_IDS } from '@/config/test-ids';
 
 export default function Footer() {
   return (
-    <footer className="bg-gray-900 text-gray-300">
+    <footer className="bg-gray-900 text-gray-300" data-testid={TEST_IDS.FOOTER}>
       <div className="container mx-auto px-4 py-16">
         {/* Top Section */}
         <div className="mb-12">

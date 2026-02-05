@@ -6,6 +6,7 @@ import { Search, MapPin, Users, Star } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { FadeIn, StaggerContainer, StaggerItem } from '@/components/ui/motion';
+import { TEST_IDS } from '@/config/test-ids';
 
 export default function HeroSection() {
   const router = useRouter();
@@ -27,7 +28,7 @@ export default function HeroSection() {
   };
 
   return (
-    <section className="relative min-h-[calc(100vh-64px)] flex items-center justify-center overflow-hidden">
+    <section className="relative min-h-[calc(100vh-64px)] flex items-center justify-center overflow-hidden" data-testid={TEST_IDS.HERO_SECTION}>
       {/* Background Gradient */}
       <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-background to-accent/20" />
 
@@ -72,6 +73,7 @@ export default function HeroSection() {
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onKeyDown={handleKeyDown}
                 className="pl-12 pr-4 h-14 text-base rounded-full border-2 transition-all duration-300 focus:border-primary focus:ring-4 focus:ring-primary/20 focus:scale-[1.02]"
+                data-testid={TEST_IDS.HERO_SEARCH}
               />
             </div>
           </div>
@@ -83,6 +85,7 @@ export default function HeroSection() {
             size="lg"
             className="rounded-full px-8 h-12 text-base mb-12 transition-transform hover:scale-105"
             onClick={handleSearch}
+            data-testid={TEST_IDS.HERO_CTA_BUTTON}
           >
             <MapPin className="mr-2 h-5 w-5" />
             도시 탐색하기

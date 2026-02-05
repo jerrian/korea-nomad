@@ -4,6 +4,7 @@ import { Target, BarChart3, Users, Map, Calculator, Camera } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card';
 import { features } from '@/data/cities';
 import { FadeIn, StaggerContainer, StaggerItem } from '@/components/ui/motion';
+import { TEST_IDS } from '@/config/test-ids';
 
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   Target,
@@ -16,7 +17,7 @@ const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
 
 export default function Features() {
   return (
-    <section className="py-20 bg-muted/30">
+    <section className="py-20 bg-muted/30" data-testid={TEST_IDS.FEATURES}>
       <div className="container mx-auto px-4">
         {/* Section Header */}
         <FadeIn>

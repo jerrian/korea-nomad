@@ -6,10 +6,11 @@ import { Button } from '@/components/ui/button';
 import CityCard from './CityCard';
 import { featuredCities } from '@/data/cities';
 import { FadeIn, StaggerContainer, StaggerItem } from '@/components/ui/motion';
+import { TEST_IDS } from '@/config/test-ids';
 
 export default function FeaturedCities() {
   return (
-    <section id="featured-cities" className="py-20 bg-muted/30">
+    <section id="featured-cities" className="py-20 bg-muted/30" data-testid={TEST_IDS.FEATURED_CITIES}>
       <div className="container mx-auto px-4">
         {/* Section Header */}
         <FadeIn>

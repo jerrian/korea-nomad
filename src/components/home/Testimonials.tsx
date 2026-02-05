@@ -11,6 +11,7 @@ import {
 } from '@/components/ui/carousel';
 import { testimonials } from '@/data/cities';
 import { FadeIn } from '@/components/ui/motion';
+import { TEST_IDS } from '@/config/test-ids';
 
 function StarRating({ rating }: { rating: number }) {
   return (
@@ -31,7 +32,7 @@ function StarRating({ rating }: { rating: number }) {
 
 export default function Testimonials() {
   return (
-    <section className="py-20">
+    <section className="py-20" data-testid={TEST_IDS.TESTIMONIALS}>
       <div className="container mx-auto px-4">
         {/* Section Header */}
         <FadeIn>

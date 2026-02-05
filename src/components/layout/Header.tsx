@@ -4,13 +4,14 @@ import { Button } from '@/components/ui/button';
 import { navItems } from '@/data/cities';
 import MobileMenu from './MobileMenu';
 import AuthButtons from '@/components/auth/AuthButtons';
+import { TEST_IDS } from '@/config/test-ids';
 
 export default function Header() {
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <header data-testid={TEST_IDS.HEADER} className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-2">
+        <Link href="/" className="flex items-center gap-2" data-testid={TEST_IDS.LOGO}>
           <span className="text-2xl">🇰🇷</span>
           <span className="text-xl font-bold text-primary">KoreaNomad</span>
         </Link>

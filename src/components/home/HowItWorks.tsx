@@ -3,6 +3,7 @@
 import { Search, BarChart3, Plane, ArrowRight } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { FadeIn, StaggerContainer, StaggerItem } from '@/components/ui/motion';
+import { TEST_IDS } from '@/config/test-ids';
 
 const steps = [
   {
@@ -30,7 +31,7 @@ const steps = [
 
 export default function HowItWorks() {
   return (
-    <section className="py-20">
+    <section className="py-20" data-testid={TEST_IDS.HOW_IT_WORKS}>
       <div className="container mx-auto px-4">
         {/* Section Header */}
         <FadeIn>

@@ -4,6 +4,7 @@ import { useEffect, useState, useRef } from 'react';
 import { Building2, Users, Star, Calendar, Coffee, Wifi } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { statistics } from '@/data/cities';
+import { TEST_IDS } from '@/config/test-ids';
 
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   Building2,
@@ -90,7 +91,7 @@ export default function Statistics() {
   }, []);
 
   return (
-    <section ref={sectionRef} className="py-20 bg-muted/30">
+    <section ref={sectionRef} className="py-20 bg-muted/30" data-testid={TEST_IDS.STATISTICS}>
       <div className="container mx-auto px-4">
         {/* Section Header */}
         <div className="text-center mb-12">

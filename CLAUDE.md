@@ -14,6 +14,10 @@ KoreaNomad는 한국의 디지털 노마드들이 최적의 도시를 찾고 커
 - **Animation**: Framer Motion 12.27.5, tw-animate-css 1.4.0
 - **Icons**: Lucide React 0.562.0
 - **Carousel**: Embla Carousel 8.6.0
+- **Testing**:
+  - **Unit/Integration**: Vitest 2.1.0, @testing-library/react 16.1.0
+  - **E2E**: Playwright 1.58.1
+  - **Mocking**: vitest-localstorage-mock 0.1.2
 
 ## 프로젝트 구조
 
@@ -34,6 +38,8 @@ KoreaNomad는 한국의 디지털 노마드들이 최적의 도시를 찾고 커
 │       └── login.md            # 로그인 기능 실행 계획
 ├── wt-claude.sh                # 워크트리 + Claude Code 실행 스크립트
 ├── src/
+│   ├── __tests__/
+│   │   └── setup.ts            # Vitest 공통 셋업
 │   ├── app/                    # Next.js App Router 페이지
 │   │   ├── layout.tsx          # 루트 레이아웃 (AuthProvider 포함)
 │   │   ├── page.tsx            # 홈페이지
@@ -95,9 +101,35 @@ KoreaNomad는 한국의 디지털 노마드들이 최적의 도시를 찾고 커
 │   └── data/
 │       ├── cities.ts           # 도시 목록 정적 데이터
 │       └── cityDetails.ts      # 도시 상세 및 리뷰 데이터
+├── e2e/                        # E2E 테스트 (Playwright)
+│   ├── fixtures/               # 테스트 픽스처
+│   │   ├── base.ts             # 기본 픽스처
+│   │   └── auth.fixture.ts     # 인증 픽스처
+│   ├── page-objects/           # Page Object Model
+│   │   ├── base.page.ts        # 기본 페이지 클래스
+│   │   ├── components/         # 컴포넌트 객체
+│   │   │   ├── header.component.ts
+│   │   │   ├── footer.component.ts
+│   │   │   └── auth-modal.component.ts
+│   │   └── pages/              # 페이지 객체
+│   │       ├── home.page.ts
+│   │       ├── cities-list.page.ts
+│   │       └── city-detail.page.ts
+│   ├── tests/                  # 테스트 파일
+│   │   ├── e2e/                # E2E 플로우 테스트
+│   │   ├── pages/              # 페이지별 테스트
+│   │   ├── features/           # 기능별 테스트
+│   │   └── visual/             # 비주얼 리그레션
+│   ├── test-data/              # 테스트 데이터
+│   ├── utils/                  # 테스트 유틸리티
+│   ├── hooks/                  # 글로벌 훅
+│   ├── config/                 # 테스트 설정
+│   └── README.md               # E2E 테스트 가이드
 ├── public/                     # 정적 파일
 ├── package.json
 ├── tsconfig.json
+├── vitest.config.ts            # Vitest 설정
+├── playwright.config.ts        # Playwright 설정
 ├── next.config.ts              # Next.js 설정 (이미지 도메인)
 ├── components.json             # shadcn/ui 설정
 ├── eslint.config.mjs           # ESLint 설정
@@ -115,18 +147,37 @@ KoreaNomad는 한국의 디지털 노마드들이 최적의 도시를 찾고 커
 
 ## 주요 명령어
 
+### 개발 서버
 ```bash
-# 개발 서버 실행
-npm run dev
+npm run dev          # 개발 서버 실행
+npm run build        # 프로덕션 빌드
+npm run start        # 프로덕션 서버 실행
+npm run lint         # ESLint 실행
+```
 
-# 프로덕션 빌드
-npm run build
+### 단위/통합 테스트 (Vitest)
+```bash
+npm test             # 감시 모드로 테스트 실행
+npm run test:ui      # UI 대시보드와 함께 실행
+npm run test:run     # 한 번만 실행 (CI용)
+npm run test:coverage # 커버리지 분석
+npm run test:watch   # 감시 모드 (test와 동일)
+```
 
-# 프로덕션 서버 실행
-npm run start
+### E2E 테스트 (Playwright - Chromium 기반만 지원)
+```bash
+npm run test:e2e          # 모든 Chromium 기반 브라우저 테스트 (Desktop, Mobile, Tablet)
+npm run test:e2e:ui       # UI 모드로 실행 (추천)
+npm run test:e2e:debug    # 디버그 모드
+npm run test:e2e:headed   # 브라우저 표시 모드
+npm run test:e2e:chromium # Desktop Chrome만 테스트
+npm run test:e2e:mobile   # Mobile Chrome만 테스트
+npm run test:e2e:tablet   # iPad만 테스트
+npm run test:e2e:report   # 테스트 리포트 보기
+npm run test:e2e:codegen  # 테스트 코드 생성기
 
-# ESLint 실행
-npm run lint
+# 주의: Firefox, Webkit(Safari) 브라우저는 미설치 상태로 지원하지 않습니다.
+# 지원 브라우저: Desktop Chrome, Mobile Chrome (Pixel 5), iPad (iPad Pro)
 ```
 
 ## 코딩 컨벤션
@@ -351,6 +402,341 @@ export async function generateStaticParams()
 - 검색 기능에 디바운싱 적용 (300ms)
 - 모든 외부 링크는 `target="_blank" rel="noopener noreferrer"` 사용
 - 접근성 고려 (WCAG 2.1 준수)
+
+## 테스트
+
+### 테스트 전략
+
+KoreaNomad는 **2단계 테스트 전략**을 채택합니다:
+1. **단위/통합 테스트 (Vitest)** - 로직, 훅, 유틸리티 함수 검증
+2. **E2E 테스트 (Playwright)** - 사용자 플로우 및 UI 인터랙션 검증
+
+### 1. 단위/통합 테스트 (Vitest)
+
+#### 테스트 위치
+- **파일 위치**: `src/` 폴더 내부에 `.test.tsx` 또는 `.test.ts` 파일로 배치
+- **셋업 파일**: `src/__tests__/setup.ts`
+
+#### 테스트 대상
+- 유틸리티 함수 (`src/lib/auth.ts`, `src/lib/utils.ts`)
+- 커스텀 훅 (`src/hooks/useDebounce.ts`)
+- Context (`src/contexts/AuthContext.tsx`)
+- 데이터 함수 (`src/data/cityDetails.ts`)
+
+#### 설정 (`vitest.config.ts`)
+```typescript
+{
+  environment: 'jsdom',           // DOM 환경 모의
+  globals: true,                  // 전역 test 함수
+  setupFiles: ['./src/__tests__/setup.ts'],
+  coverage: {
+    thresholds: {
+      lines: 80,
+      functions: 80,
+      branches: 75,
+      statements: 80,
+    },
+  },
+}
+```
+
+#### 테스트 작성 패턴
+```typescript
+import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { renderHook, act } from '@testing-library/react';
+
+describe('기능 설명', () => {
+  beforeEach(() => {
+    localStorage.clear();
+    vi.clearAllMocks();
+  });
+
+  it('should [동작]', () => {
+    // Arrange - 준비
+    // Act - 실행
+    // Assert - 검증
+  });
+});
+```
+
+#### 모의(Mock) 객체
+- **Framer Motion**: motion 컴포넌트, AnimatePresence, useInView
+- **Embla Carousel**: carousel API 및 제어 메서드
+- **Window API**: matchMedia, IntersectionObserver, ResizeObserver
+- **localStorage**: vitest-localstorage-mock 사용
+
+#### 커버리지 제외 대상
+- 테스트 파일 자체 (`*.test.{ts,tsx}`)
+- `__tests__` 디렉토리
+- Next.js App Router (`src/app/**`)
+- 타입 정의 (`src/types/**`)
+
+### 2. E2E 테스트 (Playwright)
+
+#### 테스트 위치
+```
+e2e/
+├── fixtures/           # 테스트 픽스처
+├── page-objects/       # Page Object Model
+├── tests/              # 테스트 파일
+│   ├── e2e/           # E2E 플로우
+│   ├── pages/         # 페이지별 테스트
+│   ├── features/      # 기능별 테스트
+│   └── visual/        # 비주얼 리그레션
+├── test-data/         # 테스트 데이터
+└── utils/             # 헬퍼 함수
+```
+
+#### Page Object Model (POM) 패턴
+
+**Base Page**
+```typescript
+// e2e/page-objects/base.page.ts
+export abstract class BasePage {
+  constructor(protected page: Page) {}
+
+  async goto(path: string): Promise<void>
+  async expectURL(pattern: string | RegExp): Promise<void>
+
+  // 공통 컴포넌트
+  readonly header: HeaderComponent;
+  readonly footer: FooterComponent;
+}
+```
+
+**페이지 객체**
+```typescript
+// e2e/page-objects/pages/home.page.ts
+export class HomePage extends BasePage {
+  readonly path = '/';
+
+  // Locators
+  readonly heroSection: Locator;
+  readonly featuredCities: Locator;
+
+  // Actions
+  async searchCity(query: string): Promise<void>
+  async clickCityCard(slug: string): Promise<void>
+
+  // Assertions
+  async expectHeroVisible(): Promise<void>
+  async expectFeaturedCitiesCount(count: number): Promise<void>
+}
+```
+
+#### Fixtures
+
+**기본 픽스처**
+```typescript
+// e2e/fixtures/base.ts
+import { test as base } from '@playwright/test';
+
+export const test = base.extend<PageObjects>({
+  homePage: async ({ page }, use) => {
+    await use(new HomePage(page));
+  },
+  citiesListPage: async ({ page }, use) => {
+    await use(new CitiesListPage(page));
+  },
+});
+```
+
+**인증 픽스처**
+```typescript
+// e2e/fixtures/auth.fixture.ts
+export const authTest = testBase.extend<AuthFixtures>({
+  authenticatedPage: async ({ page, testUser }, use) => {
+    // localStorage에 사용자 정보 설정
+    await setAuthenticatedUser(page, testUser);
+    await use(page);
+  },
+});
+```
+
+#### 테스트 작성 예시
+
+**페이지 테스트**
+```typescript
+// e2e/tests/pages/home.spec.ts
+import { test, expect } from '../../fixtures/base';
+
+test.describe('Home Page', () => {
+  test.beforeEach(async ({ homePage }) => {
+    await homePage.goto(homePage.path);
+  });
+
+  test('displays featured cities', async ({ homePage }) => {
+    await homePage.expectFeaturedCitiesVisible();
+    await homePage.expectFeaturedCitiesCount(8);
+  });
+
+  test('clicking city card navigates to detail', async ({ homePage, page }) => {
+    await homePage.clickCityCard('seoul');
+    await expect(page).toHaveURL(/\/cities\/seoul/);
+  });
+});
+```
+
+**E2E 플로우 테스트**
+```typescript
+// e2e/tests/e2e/user-journey.spec.ts
+test('complete user journey', async ({ homePage, citiesListPage, page }) => {
+  // 1. 홈페이지 방문
+  await homePage.goto('/');
+
+  // 2. 도시 카드 클릭
+  await homePage.clickCityCard('seoul');
+
+  // 3. 도시 상세 확인
+  await expect(page).toHaveURL(/\/cities\/seoul/);
+
+  // 4. Cities 목록으로 이동
+  await page.goto('/cities');
+
+  // 5. 검색
+  await citiesListPage.searchCities('부산');
+  await citiesListPage.expectCityVisible('busan');
+});
+```
+
+#### 브라우저 커버리지 (Chromium 기반만)
+- **데스크톱**: Chrome (chromium)
+- **모바일**: Mobile Chrome (Pixel 5)
+- **태블릿**: iPad (iPad Pro)
+- ⚠️ **미지원**: Firefox, Webkit(Safari), Mobile Safari
+
+#### 테스트 데이터 관리
+
+**중앙화된 Test IDs**
+```typescript
+// e2e/config/test-ids.ts
+export const TEST_IDS = {
+  LOGIN_BUTTON: 'login-button',
+  CITY_CARD: (slug: string) => `city-card-${slug}`,
+  SEARCH_INPUT: 'search-input',
+  // ...
+};
+```
+
+**테스트 데이터**
+```typescript
+// e2e/test-data/cities.data.ts
+export const TEST_CITIES = {
+  seoul: { slug: 'seoul', name: '서울', region: '서울' },
+  busan: { slug: 'busan', name: '부산', region: '경상도' },
+  // ...
+};
+```
+
+#### 유틸리티 함수
+
+**대기 헬퍼**
+```typescript
+// e2e/utils/wait.ts
+export async function waitForDebounce(page: Page): Promise<void> {
+  await page.waitForTimeout(350); // 검색 디바운스 대기
+}
+```
+
+**스토리지 헬퍼**
+```typescript
+// e2e/utils/storage.ts
+export async function setAuthenticatedUser(page: Page, user: User): Promise<void> {
+  await page.evaluate(({ user }) => {
+    localStorage.setItem('koreanomad_current_user', JSON.stringify(user));
+  }, { user });
+}
+```
+
+### 테스트 실행 순서
+
+#### 로컬 개발
+1. **단위 테스트**: `npm test` (감시 모드)
+2. **E2E 테스트**: `npm run test:e2e:ui` (UI 모드)
+
+#### CI/CD
+1. **Lint**: `npm run lint`
+2. **단위 테스트**: `npm run test:run`
+3. **커버리지 체크**: `npm run test:coverage`
+4. **E2E 테스트**: `npm run test:e2e`
+
+### data-testid 컨벤션
+
+E2E 테스트를 위해 컴포넌트에 `data-testid` 속성을 추가합니다:
+
+```tsx
+// ❌ 나쁜 예
+<button className="login-btn">로그인</button>
+
+// ✅ 좋은 예
+import { TEST_IDS } from '@/e2e/config/test-ids';
+
+<button data-testid={TEST_IDS.LOGIN_BUTTON}>로그인</button>
+```
+
+**주요 컴포넌트 data-testid 추가 대상:**
+- `src/components/layout/Header.tsx` - 로고, 네비게이션, 로그인 버튼
+- `src/components/auth/*` - 로그인/회원가입 모달 입력 필드
+- `src/components/home/CityCard.tsx` - 도시 카드
+- `src/components/cities/SearchBar.tsx` - 검색 입력
+- `src/components/cities/FilterPanel.tsx` - 필터 옵션
+
+### 디버깅 팁
+
+#### Vitest
+```bash
+# 특정 파일만 테스트
+npm test -- auth.test.ts
+
+# 디버그 모드
+node --inspect-brk ./node_modules/vitest/vitest.mjs
+```
+
+#### Playwright
+```bash
+# UI 모드 (추천)
+npm run test:e2e:ui
+
+# 디버그 모드
+npm run test:e2e:debug
+
+# 특정 파일만
+npx playwright test home.spec.ts
+
+# 코드 생성기
+npm run test:e2e:codegen
+```
+
+### 테스트 리포트
+
+#### Vitest 커버리지
+```bash
+npm run test:coverage
+```
+- HTML 리포트: `coverage/index.html`
+- 콘솔 출력: 파일별 커버리지 퍼센트
+
+#### Playwright 리포트
+```bash
+npm run test:e2e:report
+```
+- HTML 리포트: `playwright-report/index.html`
+- 스크린샷, 비디오, Trace 뷰어 포함
+
+### CI/CD 통합
+
+#### GitHub Actions
+- **워크플로우**: `.github/workflows/playwright.yml`
+- **트리거**: main/develop 브랜치 push 및 PR
+- **아티팩트**:
+  - 테스트 리포트 (30일 보관)
+  - 테스트 결과 (7일 보관)
+
+### 참고 자료
+- Vitest 문서: https://vitest.dev
+- Playwright 문서: https://playwright.dev
+- Testing Library: https://testing-library.com
+- E2E 테스트 가이드: `e2e/README.md`
 
 ## 커스텀 커맨드
 
