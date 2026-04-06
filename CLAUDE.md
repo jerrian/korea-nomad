@@ -26,17 +26,18 @@ KoreaNomad는 한국의 디지털 노마드들이 최적의 도시를 찾고 커
 ├── CLAUDE.md                   # 프로젝트 가이드 (이 파일)
 ├── .claude/
 │   ├── timesheet-groups.json   # 타임시트 그룹 정의 파일
-│   └── commands/               # Claude Code 커스텀 커맨드
-│       ├── decompose.md
-│       ├── create-issue.md
-│       ├── solve-issue.md
-│       └── timesheet-report.md
+│   ├── commands/               # Claude Code 커스텀 커맨드
+│   │   ├── decompose.md
+│   │   ├── create-issue.md
+│   │   ├── solve-issue.md
+│   │   └── timesheet-report.md
+│   └── utils/                  # 유틸리티 스크립트
+│       └── wt-claude.sh        # 워크트리 + Claude Code 실행 스크립트
 ├── docs/                       # 기획 및 계획 문서
 │   ├── PRD.md
 │   ├── IMPROVEMENT_PLAN.md
 │   └── execution_plans/
 │       └── login.md            # 로그인 기능 실행 계획
-├── wt-claude.sh                # 워크트리 + Claude Code 실행 스크립트
 ├── src/
 │   ├── __tests__/
 │   │   └── setup.ts            # Vitest 공통 셋업

@@ -19,8 +19,9 @@ set -euo pipefail
 # ─────────────────────────────────────────────
 # 설정
 # ─────────────────────────────────────────────
-REPO_DIR="$(cd "$(dirname "$0")" && pwd)"
-WORKTREE_BASE="$(cd "$(dirname "$0")/.." && pwd)/worktrees"
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+REPO_DIR="$(git -C "$SCRIPT_DIR" rev-parse --show-toplevel)"
+WORKTREE_BASE="$(cd "$REPO_DIR/.." && pwd)/worktrees"
 DEFAULT_BASE="main"
 
 # ─────────────────────────────────────────────
